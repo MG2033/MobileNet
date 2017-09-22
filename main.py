@@ -34,7 +34,7 @@ def main():
 
     # Model creation
     print("Building the model...")
-    model = MobileNet()
+    model = MobileNet(config_args)
     print("Model is built successfully\n\n")
 
     # Summarizer creation

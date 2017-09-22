@@ -1,7 +1,7 @@
 {
   "experiment_dir": "test_experiment",
   "num_epochs": 100,
-  "num_classes": 200,
+  "num_classes": 1001,
   "batch_size": 1,
   "width_multiplier":1.0,
   "shuffle": true,

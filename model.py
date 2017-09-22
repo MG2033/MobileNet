@@ -1,5 +1,5 @@
 import tensorflow as tf
-from layers import depthwise_separable_conv2d, conv2d
+from layers import depthwise_separable_conv2d, conv2d, avg_pool_2d, dense, flatten
 import os
 from utils import load_obj, save_obj
 
@@ -74,102 +74,111 @@ class MobileNet:
 
     def __init_network(self):
         with tf.variable_scope('mobilenet_encoder'):
-            self.conv1_1 = conv2d('conv_1', self.X, num_filters=int(round(32 * self.args.width_multipler)),
+            resized = tf.image.resize_bilinear(self.X, [224, 224])
+            self.conv1_1 = conv2d('conv_1', resized, num_filters=int(round(32 * self.args.width_multiplier)),
                                   kernel_size=(3, 3),
                                   padding='SAME', stride=(2, 2), activation=tf.nn.relu, batchnorm_enabled=True,
-                                  is_training=self.is_training, l2_strength=self.args.weight_decay)
+                                  is_training=self.is_training, l2_strength=self.args.l2_strength, bias=self.args.bias)
 
             self.conv2_1 = depthwise_separable_conv2d('conv_ds_2', self.conv1_1,
-                                                      width_multiplier=self.args.width_multipler,
+                                                      width_multiplier=self.args.width_multiplier,
                                                       num_filters=64, kernel_size=(3, 3), padding='SAME', stride=(1, 1),
                                                       batchnorm_enabled=True, is_training=self.is_training,
-                                                      l2_strength=self.args.weight_decay)
+                                                      l2_strength=self.args.l2_strength,
+                                                      biases=(self.args.bias, self.args.bias))
             self.conv2_2 = depthwise_separable_conv2d('conv_ds_3', self.conv2_1,
-                                                      width_multiplier=self.args.width_multipler,
+                                                      width_multiplier=self.args.width_multiplier,
                                                       num_filters=128, kernel_size=(3, 3), padding='SAME',
                                                       stride=(2, 2),
                                                       batchnorm_enabled=True, is_training=self.is_training,
-                                                      l2_strength=self.args.weight_decay)
+                                                      l2_strength=self.args.l2_strength,
+                                                      biases=(self.args.bias, self.args.bias))
 
             self.conv3_1 = depthwise_separable_conv2d('conv_ds_4', self.conv2_2,
-                                                      width_multiplier=self.args.width_multipler,
+                                                      width_multiplier=self.args.width_multiplier,
                                                       num_filters=128, kernel_size=(3, 3), padding='SAME',
                                                       stride=(1, 1),
                                                       batchnorm_enabled=True, is_training=self.is_training,
-                                                      l2_strength=self.args.weight_decay)
+                                                      l2_strength=self.args.l2_strength,
+                                                      biases=(self.args.bias, self.args.bias))
             self.conv3_2 = depthwise_separable_conv2d('conv_ds_5', self.conv3_1,
-                                                      width_multiplier=self.args.width_multipler,
+                                                      width_multiplier=self.args.width_multiplier,
                                                       num_filters=256, kernel_size=(3, 3), padding='SAME',
                                                       stride=(2, 2),
                                                       batchnorm_enabled=True, is_training=self.is_training,
-                                                      l2_strength=self.args.weight_decay)
+                                                      l2_strength=self.args.l2_strength,
+                                                      biases=(self.args.bias, self.args.bias))
 
             self.conv4_1 = depthwise_separable_conv2d('conv_ds_6', self.conv3_2,
-                                                      width_multiplier=self.args.width_multipler,
+                                                      width_multiplier=self.args.width_multiplier,
                                                       num_filters=256, kernel_size=(3, 3), padding='SAME',
                                                       stride=(1, 1),
                                                       batchnorm_enabled=True, is_training=self.is_training,
-                                                      l2_strength=self.args.weight_decay)
+                                                      l2_strength=self.args.l2_strength,
+                                                      biases=(self.args.bias, self.args.bias))
             self.conv4_2 = depthwise_separable_conv2d('conv_ds_7', self.conv4_1,
-                                                      width_multiplier=self.args.width_multipler,
+                                                      width_multiplier=self.args.width_multiplier,
                                                       num_filters=512, kernel_size=(3, 3), padding='SAME',
                                                       stride=(2, 2),
                                                       batchnorm_enabled=True, is_training=self.is_training,
-                                                      l2_strength=self.args.weight_decay)
+                                                      l2_strength=self.args.l2_strength,
+                                                      biases=(self.args.bias, self.args.bias))
 
             self.conv5_1 = depthwise_separable_conv2d('conv_ds_8', self.conv4_2,
-                                                      width_multiplier=self.args.width_multipler,
+                                                      width_multiplier=self.args.width_multiplier,
                                                       num_filters=512, kernel_size=(3, 3), padding='SAME',
                                                       stride=(1, 1),
                                                       batchnorm_enabled=True, is_training=self.is_training,
-                                                      l2_strength=self.args.weight_decay)
+                                                      l2_strength=self.args.l2_strength,
+                                                      biases=(self.args.bias, self.args.bias))
             self.conv5_2 = depthwise_separable_conv2d('conv_ds_9', self.conv5_1,
-                                                      width_multiplier=self.args.width_multipler,
+                                                      width_multiplier=self.args.width_multiplier,
                                                       num_filters=512, kernel_size=(3, 3), padding='SAME',
                                                       stride=(1, 1),
                                                       batchnorm_enabled=True, is_training=self.is_training,
-                                                      l2_strength=self.args.weight_decay)
+                                                      l2_strength=self.args.l2_strength,
+                                                      biases=(self.args.bias, self.args.bias))
             self.conv5_3 = depthwise_separable_conv2d('conv_ds_10', self.conv5_2,
-                                                      width_multiplier=self.args.width_multipler,
+                                                      width_multiplier=self.args.width_multiplier,
                                                       num_filters=512, kernel_size=(3, 3), padding='SAME',
                                                       stride=(1, 1),
                                                       batchnorm_enabled=True, is_training=self.is_training,
-                                                      l2_strength=self.args.weight_decay)
+                                                      l2_strength=self.args.l2_strength,
+                                                      biases=(self.args.bias, self.args.bias))
             self.conv5_4 = depthwise_separable_conv2d('conv_ds_11', self.conv5_3,
-                                                      width_multiplier=self.args.width_multipler,
+                                                      width_multiplier=self.args.width_multiplier,
                                                       num_filters=512, kernel_size=(3, 3), padding='SAME',
                                                       stride=(1, 1),
                                                       batchnorm_enabled=True, is_training=self.is_training,
-                                                      l2_strength=self.args.weight_decay)
+                                                      l2_strength=self.args.l2_strength,
+                                                      biases=(self.args.bias, self.args.bias))
             self.conv5_5 = depthwise_separable_conv2d('conv_ds_12', self.conv5_4,
-                                                      width_multiplier=self.args.width_multipler,
+                                                      width_multiplier=self.args.width_multiplier,
                                                       num_filters=512, kernel_size=(3, 3), padding='SAME',
                                                       stride=(1, 1),
                                                       batchnorm_enabled=True, is_training=self.is_training,
-                                                      l2_strength=self.args.weight_decay)
+                                                      l2_strength=self.args.l2_strength,
+                                                      biases=(self.args.bias, self.args.bias))
             self.conv5_6 = depthwise_separable_conv2d('conv_ds_13', self.conv5_5,
-                                                      width_multiplier=self.args.width_multipler,
+                                                      width_multiplier=self.args.width_multiplier,
                                                       num_filters=1024, kernel_size=(3, 3), padding='SAME',
                                                       stride=(2, 2),
                                                       batchnorm_enabled=True, is_training=self.is_training,
-                                                      l2_strength=self.args.weight_decay)
+                                                      l2_strength=self.args.l2_strength,
+                                                      biases=(self.args.bias, self.args.bias))
 
             self.conv6_1 = depthwise_separable_conv2d('conv_ds_14', self.conv5_6,
-                                                      width_multiplier=self.args.width_multipler,
+                                                      width_multiplier=self.args.width_multiplier,
                                                       num_filters=1024, kernel_size=(3, 3), padding='SAME',
                                                       stride=(1, 1),
                                                       batchnorm_enabled=True, is_training=self.is_training,
-                                                      l2_strength=self.args.weight_decay)
+                                                      l2_strength=self.args.l2_strength,
+                                                      biases=(self.args.bias, self.args.bias))
 
-            print(self.conv6_1.shape)
-            # Pooling is removed.
-            self.score_fr = conv2d('conv_1c_1x1', self.conv6_1, num_filters=self.args.num_classes,
-                                   l2_strength=self.args.weight_decay,
-                                   kernel_size=(1, 1))
-            self.feed1 = self.conv4_2
-            self.feed2 = self.conv3_2
-
-            print("\nEncoder MobileNet is built successfully\n\n")
+            self.avg_pool = avg_pool_2d(self.conv6_1, size=(7, 7), stride=(1, 1))
+            self.logits = flatten(conv2d('fc', self.avg_pool, kernel_size=(1, 1), num_filters=self.args.num_classes,
+                                         l2_strength=self.args.l2_strength,
+                                         bias=self.args.bias))
 
     def __init_output(self):
         with tf.variable_scope('output'):
@@ -196,6 +205,7 @@ class MobileNet:
 
     def load_pretrained_weights(self, sess):
         print("Loading ImageNet Pretrained Weights...")
+        # self.__convert_graph_names(os.path.realpath('pretrained_weights/mobilenet_v1_vanilla.pkl'))
         self.__restore(self.pretrained_path, sess)
         print("ImageNet Pretrained Weights Loaded Initially")
 
@@ -238,6 +248,10 @@ class MobileNet:
                                 "biases") != -1 or key.find("beta") != -1 and variable.name.find(
                                 "beta") != -1 or key.find("gamma") != -1 and variable.name.find(
                                 "gamma") != -1:
+                                dict_output[variable.name] = value
+                        elif key.find("Logits") != -1 and variable.name.find("fc") != -1:
+                            if key.find("weights") != -1 and variable.name.find("weights") != -1 or key.find(
+                                    "biases") != -1 and variable.name.find("biases") != -1:
                                 dict_output[variable.name] = value
 
         save_obj(dict_output, self.pretrained_path)
