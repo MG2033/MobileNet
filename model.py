@@ -71,6 +71,7 @@ class MobileNet:
     def __build(self):
         self.__init_input()
         self.__init_network()
+        self.__init_output()
 
     def __init_network(self):
         with tf.variable_scope('mobilenet_encoder'):

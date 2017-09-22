@@ -54,7 +54,7 @@ class Train:
             self.saver.restore(self.sess, latest_checkpoint)
             print("Checkpoint loaded\n\n")
         else:
-            print("First time to train!\n\n")
+            print("No checkpoints available!\n\n")
 
     ############################################################################################################
     # Train and Test methods

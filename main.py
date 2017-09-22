@@ -52,7 +52,7 @@ def main():
 
     if config_args.to_test:
         print("Final test!")
-        trainer.test()
+        trainer.test('val')
         print("Testing Finished\n\n")
 
 
