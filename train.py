@@ -148,9 +148,10 @@ class Train:
                          self.model.is_training: False
                          }
             # Run the feed_forward
-            loss, acc = self.sess.run(
-                [self.model.loss, self.model.accuracy],
+            loss, acc, argmax = self.sess.run(
+                [self.model.loss, self.model.accuracy, self.model.y_out_argmax],
                 feed_dict=feed_dict)
+            print(argmax)
             # Append loss and accuracy
             loss_list += [loss]
             acc_list += [acc]

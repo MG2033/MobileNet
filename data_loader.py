@@ -9,6 +9,7 @@ class DataLoader:
         self.X_train = None
         self.X_mean = None
         self.y_train = None
+        self.img_mean = None
         self.train_data_len = 0
 
         self.X_val = None
@@ -30,16 +31,18 @@ class DataLoader:
         self.X_mean = np.mean(self.X_train, axis=0)
         train_data = None
 
-        val_data = np.load("./data/tiny-image-net-200/tiny-image-net-200-val.npz")
-        self.X_val = val_data['arr_0']
-        self.y_val = val_data['arr_1']
+        import matplotlib.pyplot as plt
+        val_data = np.array([plt.imread('./data/tiny-image-net-200/0.jpg')])
+
+        self.X_val = val_data
+        self.y_val = np.array([0])
         val_data = None
 
         self.train_data_len = self.X_train.shape[0]
         self.val_data_len = self.X_val.shape[0]
-        img_height = self.X_train.shape[1]
-        img_width = self.X_train.shape[2]
-        num_channels = self.X_train.shape[3]
+        img_height = 224
+        img_width = 224
+        num_channels = 3
         return img_height, img_width, num_channels, self.train_data_len, self.val_data_len
 
     def generate_batch(self, type='train'):
@@ -59,7 +62,7 @@ class DataLoader:
                     new_epoch = False
 
                 # Batch mask selection
-                X_batch = self.X_train[mask[start_idx:start_idx + self.batch_size]] - self.X_mean
+                X_batch = self.X_train[mask[start_idx:start_idx + self.batch_size]]
                 y_batch = self.y_train[mask[start_idx:start_idx + self.batch_size]]
                 start_idx += self.batch_size
 
@@ -73,7 +76,7 @@ class DataLoader:
             start_idx = 0
             while True:
                 # Batch mask selection
-                X_batch = self.X_test[start_idx:start_idx + self.batch_size] - self.X_mean
+                X_batch = self.X_test[start_idx:start_idx + self.batch_size]
                 y_batch = self.y_test[start_idx:start_idx + self.batch_size]
                 start_idx += self.batch_size
 
@@ -86,7 +89,7 @@ class DataLoader:
             start_idx = 0
             while True:
                 # Batch mask selection
-                X_batch = self.X_val[start_idx:start_idx + self.batch_size] - self.X_mean
+                X_batch = self.X_val[start_idx:start_idx + self.batch_size]
                 y_batch = self.y_val[start_idx:start_idx + self.batch_size]
                 start_idx += self.batch_size
 

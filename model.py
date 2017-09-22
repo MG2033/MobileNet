@@ -23,6 +23,7 @@ class MobileNet:
         self.y_out_argmax = None
         self.summaries_merged = None
         self.args = args
+        self.mean_img = None
 
         self.pretrained_path = os.path.realpath(self.args.pretrained_path)
 
@@ -68,30 +69,46 @@ class MobileNet:
             # is_training is for batch normalization and dropout, if they exist
             self.is_training = tf.placeholder(tf.bool)
 
+    def __init_mean(self):
+        import numpy as np
+        img_mean = np.ones((1, 224, 224, 3))
+        img_mean[:, :, :, 0] *= 103.939
+        img_mean[:, :, :, 1] *= 116.779
+        img_mean[:, :, :, 2] *= 123.68
+        self.mean_img = tf.constant(img_mean, dtype=tf.float32)
+
     def __build(self):
+        self.__init_mean()
         self.__init_input()
         self.__init_network()
         self.__init_output()
 
     def __init_network(self):
         with tf.variable_scope('mobilenet_encoder'):
-            resized = tf.image.resize_bilinear(self.X, [224, 224])
-            self.conv1_1 = conv2d('conv_1', resized, num_filters=int(round(32 * self.args.width_multiplier)),
+            with tf.name_scope('pre_processing'):
+                preprocessed_input = (self.X - self.mean_img) / 255.0
+
+            self.conv1_1 = conv2d('conv_1', preprocessed_input, num_filters=int(round(32 * self.args.width_multiplier)),
                                   kernel_size=(3, 3),
-                                  padding='SAME', stride=(2, 2), activation=tf.nn.relu, batchnorm_enabled=True,
+                                  padding='SAME', stride=(2, 2), activation=tf.nn.relu,
+                                  batchnorm_enabled=self.args.batchnorm_enabled,
                                   is_training=self.is_training, l2_strength=self.args.l2_strength, bias=self.args.bias)
 
             self.conv2_1 = depthwise_separable_conv2d('conv_ds_2', self.conv1_1,
                                                       width_multiplier=self.args.width_multiplier,
                                                       num_filters=64, kernel_size=(3, 3), padding='SAME', stride=(1, 1),
-                                                      batchnorm_enabled=True, is_training=self.is_training,
+                                                      batchnorm_enabled=self.args.batchnorm_enabled,
+                                                      activation=tf.nn.relu,
+                                                      is_training=self.is_training,
                                                       l2_strength=self.args.l2_strength,
                                                       biases=(self.args.bias, self.args.bias))
             self.conv2_2 = depthwise_separable_conv2d('conv_ds_3', self.conv2_1,
                                                       width_multiplier=self.args.width_multiplier,
                                                       num_filters=128, kernel_size=(3, 3), padding='SAME',
                                                       stride=(2, 2),
-                                                      batchnorm_enabled=True, is_training=self.is_training,
+                                                      batchnorm_enabled=self.args.batchnorm_enabled,
+                                                      activation=tf.nn.relu,
+                                                      is_training=self.is_training,
                                                       l2_strength=self.args.l2_strength,
                                                       biases=(self.args.bias, self.args.bias))
 
@@ -99,14 +116,18 @@ class MobileNet:
                                                       width_multiplier=self.args.width_multiplier,
                                                       num_filters=128, kernel_size=(3, 3), padding='SAME',
                                                       stride=(1, 1),
-                                                      batchnorm_enabled=True, is_training=self.is_training,
+                                                      batchnorm_enabled=self.args.batchnorm_enabled,
+                                                      activation=tf.nn.relu,
+                                                      is_training=self.is_training,
                                                       l2_strength=self.args.l2_strength,
                                                       biases=(self.args.bias, self.args.bias))
             self.conv3_2 = depthwise_separable_conv2d('conv_ds_5', self.conv3_1,
                                                       width_multiplier=self.args.width_multiplier,
                                                       num_filters=256, kernel_size=(3, 3), padding='SAME',
                                                       stride=(2, 2),
-                                                      batchnorm_enabled=True, is_training=self.is_training,
+                                                      batchnorm_enabled=self.args.batchnorm_enabled,
+                                                      activation=tf.nn.relu,
+                                                      is_training=self.is_training,
                                                       l2_strength=self.args.l2_strength,
                                                       biases=(self.args.bias, self.args.bias))
 
@@ -114,14 +135,18 @@ class MobileNet:
                                                       width_multiplier=self.args.width_multiplier,
                                                       num_filters=256, kernel_size=(3, 3), padding='SAME',
                                                       stride=(1, 1),
-                                                      batchnorm_enabled=True, is_training=self.is_training,
+                                                      batchnorm_enabled=self.args.batchnorm_enabled,
+                                                      activation=tf.nn.relu,
+                                                      is_training=self.is_training,
                                                       l2_strength=self.args.l2_strength,
                                                       biases=(self.args.bias, self.args.bias))
             self.conv4_2 = depthwise_separable_conv2d('conv_ds_7', self.conv4_1,
                                                       width_multiplier=self.args.width_multiplier,
                                                       num_filters=512, kernel_size=(3, 3), padding='SAME',
                                                       stride=(2, 2),
-                                                      batchnorm_enabled=True, is_training=self.is_training,
+                                                      batchnorm_enabled=self.args.batchnorm_enabled,
+                                                      activation=tf.nn.relu,
+                                                      is_training=self.is_training,
                                                       l2_strength=self.args.l2_strength,
                                                       biases=(self.args.bias, self.args.bias))
 
@@ -129,42 +154,54 @@ class MobileNet:
                                                       width_multiplier=self.args.width_multiplier,
                                                       num_filters=512, kernel_size=(3, 3), padding='SAME',
                                                       stride=(1, 1),
-                                                      batchnorm_enabled=True, is_training=self.is_training,
+                                                      batchnorm_enabled=self.args.batchnorm_enabled,
+                                                      activation=tf.nn.relu,
+                                                      is_training=self.is_training,
                                                       l2_strength=self.args.l2_strength,
                                                       biases=(self.args.bias, self.args.bias))
             self.conv5_2 = depthwise_separable_conv2d('conv_ds_9', self.conv5_1,
                                                       width_multiplier=self.args.width_multiplier,
                                                       num_filters=512, kernel_size=(3, 3), padding='SAME',
                                                       stride=(1, 1),
-                                                      batchnorm_enabled=True, is_training=self.is_training,
+                                                      batchnorm_enabled=self.args.batchnorm_enabled,
+                                                      activation=tf.nn.relu,
+                                                      is_training=self.is_training,
                                                       l2_strength=self.args.l2_strength,
                                                       biases=(self.args.bias, self.args.bias))
             self.conv5_3 = depthwise_separable_conv2d('conv_ds_10', self.conv5_2,
                                                       width_multiplier=self.args.width_multiplier,
                                                       num_filters=512, kernel_size=(3, 3), padding='SAME',
                                                       stride=(1, 1),
-                                                      batchnorm_enabled=True, is_training=self.is_training,
+                                                      batchnorm_enabled=self.args.batchnorm_enabled,
+                                                      activation=tf.nn.relu,
+                                                      is_training=self.is_training,
                                                       l2_strength=self.args.l2_strength,
                                                       biases=(self.args.bias, self.args.bias))
             self.conv5_4 = depthwise_separable_conv2d('conv_ds_11', self.conv5_3,
                                                       width_multiplier=self.args.width_multiplier,
                                                       num_filters=512, kernel_size=(3, 3), padding='SAME',
                                                       stride=(1, 1),
-                                                      batchnorm_enabled=True, is_training=self.is_training,
+                                                      batchnorm_enabled=self.args.batchnorm_enabled,
+                                                      activation=tf.nn.relu,
+                                                      is_training=self.is_training,
                                                       l2_strength=self.args.l2_strength,
                                                       biases=(self.args.bias, self.args.bias))
             self.conv5_5 = depthwise_separable_conv2d('conv_ds_12', self.conv5_4,
                                                       width_multiplier=self.args.width_multiplier,
                                                       num_filters=512, kernel_size=(3, 3), padding='SAME',
                                                       stride=(1, 1),
-                                                      batchnorm_enabled=True, is_training=self.is_training,
+                                                      batchnorm_enabled=self.args.batchnorm_enabled,
+                                                      activation=tf.nn.relu,
+                                                      is_training=self.is_training,
                                                       l2_strength=self.args.l2_strength,
                                                       biases=(self.args.bias, self.args.bias))
             self.conv5_6 = depthwise_separable_conv2d('conv_ds_13', self.conv5_5,
                                                       width_multiplier=self.args.width_multiplier,
                                                       num_filters=1024, kernel_size=(3, 3), padding='SAME',
                                                       stride=(2, 2),
-                                                      batchnorm_enabled=True, is_training=self.is_training,
+                                                      batchnorm_enabled=self.args.batchnorm_enabled,
+                                                      activation=tf.nn.relu,
+                                                      is_training=self.is_training,
                                                       l2_strength=self.args.l2_strength,
                                                       biases=(self.args.bias, self.args.bias))
 
@@ -172,7 +209,9 @@ class MobileNet:
                                                       width_multiplier=self.args.width_multiplier,
                                                       num_filters=1024, kernel_size=(3, 3), padding='SAME',
                                                       stride=(1, 1),
-                                                      batchnorm_enabled=True, is_training=self.is_training,
+                                                      batchnorm_enabled=self.args.batchnorm_enabled,
+                                                      activation=tf.nn.relu,
+                                                      is_training=self.is_training,
                                                       l2_strength=self.args.l2_strength,
                                                       biases=(self.args.bias, self.args.bias))
 

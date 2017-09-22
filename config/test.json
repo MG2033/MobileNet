@@ -2,7 +2,7 @@
   "experiment_dir": "test_experiment",
   "num_epochs": 100,
   "num_classes": 1001,
-  "batch_size": 1,
+  "batch_size": 32,
   "width_multiplier":1.0,
   "shuffle": true,
   "l2_strength": 4e-5,
