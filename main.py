@@ -35,7 +35,6 @@ def main():
     # Model creation
     print("Building the model...")
     model = MobileNet(config_args)
-    calculate_flops()
     print("Model is built successfully\n\n")
     exit(1)
 
