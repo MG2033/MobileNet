@@ -3,6 +3,7 @@ import json
 import argparse
 import os
 import pickle
+import tensorflow as tf
 
 
 def parse_args():
@@ -62,3 +63,11 @@ def load_obj(name):
 def save_obj(obj, name):
     with open(name, 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
+
+
+def calculate_flops():
+    # Print to stdout an analysis of the number of floating point operations in the
+    # model broken down by individual operations.
+    tf.profiler.profile(
+        tf.get_default_graph(),
+        options=tf.profiler.ProfileOptionBuilder.float_operation(), cmd='scope')

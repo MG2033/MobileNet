@@ -1,4 +1,4 @@
-from utils import parse_args, create_experiment_dirs
+from utils import parse_args, create_experiment_dirs, calculate_flops
 from model import MobileNet
 from train import Train
 from data_loader import DataLoader
@@ -35,7 +35,9 @@ def main():
     # Model creation
     print("Building the model...")
     model = MobileNet(config_args)
+    calculate_flops()
     print("Model is built successfully\n\n")
+    exit(1)
 
     # Summarizer creation
     summarizer = Summarizer(sess, config_args.summary_dir)
