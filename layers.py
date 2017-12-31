@@ -121,6 +121,7 @@ def __depthwise_conv2d_p(name, x, w=None, kernel_size=(3, 3), padding='SAME', st
 def depthwise_conv2d(name, x, w=None, kernel_size=(3, 3), padding='SAME', stride=(1, 1),
                      initializer=tf.contrib.layers.xavier_initializer(), l2_strength=0.0, bias=0.0, activation=None,
                      batchnorm_enabled=False, is_training=True):
+    """Implementation of depthwise 2D convolution wrapper"""
     with tf.variable_scope(name) as scope:
         conv_o_b = __depthwise_conv2d_p(name=scope, x=x, w=w, kernel_size=kernel_size, padding=padding,
                                         stride=stride, initializer=initializer, l2_strength=l2_strength, bias=bias)
@@ -145,6 +146,7 @@ def depthwise_separable_conv2d(name, x, w_depthwise=None, w_pointwise=None, widt
                                initializer=tf.contrib.layers.xavier_initializer(), l2_strength=0.0, biases=(0.0, 0.0),
                                activation=None, batchnorm_enabled=True,
                                is_training=True):
+    """Implementation of depthwise separable 2D convolution operator as in MobileNet paper"""
     total_num_filters = int(round(num_filters * width_multiplier))
     with tf.variable_scope(name) as scope:
         conv_a = depthwise_conv2d('depthwise', x=x, w=w_depthwise, kernel_size=kernel_size, padding=padding,
@@ -258,6 +260,7 @@ def max_pool_2d(x, size=(2, 2), stride=(2, 2), name='pooling'):
     Max pooling 2D Wrapper
     :param x: (tf.tensor) The input to the layer (N,H,W,C).
     :param size: (tuple) This specifies the size of the filter as well as the stride.
+    :param stride: (tuple) specifies the stride of pooling.
     :param name: (string) Scope name.
     :return: The output is the same input but halfed in both width and height (N,H/2,W/2,C).
     """

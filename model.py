@@ -2,6 +2,7 @@ import tensorflow as tf
 from layers import depthwise_separable_conv2d, conv2d, avg_pool_2d, dense, flatten
 import os
 from utils import load_obj, save_obj
+import numpy as np
 
 
 class MobileNet:
@@ -51,12 +52,6 @@ class MobileNet:
         self.conv6_1 = None
         self.flattened = None
 
-        self.score_fr = None
-
-        # These feed layers are for the decoder
-        self.feed1 = None
-        self.feed2 = None
-
         self.__build()
 
     def __init_input(self):
@@ -72,7 +67,7 @@ class MobileNet:
             self.is_training = tf.placeholder(tf.bool)
 
     def __init_mean(self):
-        import numpy as np
+        # Preparing the mean image.
         img_mean = np.ones((1, 224, 224, 3))
         img_mean[:, :, :, 0] *= 103.939
         img_mean[:, :, :, 1] *= 116.779
@@ -87,15 +82,17 @@ class MobileNet:
 
     def __init_network(self):
         with tf.variable_scope('mobilenet_encoder'):
+            # Preprocessing as done in the paper
             with tf.name_scope('pre_processing'):
                 preprocessed_input = (self.X - self.mean_img) / 255.0
 
+            # Model is here!
             self.conv1_1 = conv2d('conv_1', preprocessed_input, num_filters=int(round(32 * self.args.width_multiplier)),
                                   kernel_size=(3, 3),
                                   padding='SAME', stride=(2, 2), activation=tf.nn.relu,
                                   batchnorm_enabled=self.args.batchnorm_enabled,
                                   is_training=self.is_training, l2_strength=self.args.l2_strength, bias=self.args.bias)
-
+            ############################################################################################
             self.conv2_1 = depthwise_separable_conv2d('conv_ds_2', self.conv1_1,
                                                       width_multiplier=self.args.width_multiplier,
                                                       num_filters=64, kernel_size=(3, 3), padding='SAME', stride=(1, 1),
@@ -113,7 +110,7 @@ class MobileNet:
                                                       is_training=self.is_training,
                                                       l2_strength=self.args.l2_strength,
                                                       biases=(self.args.bias, self.args.bias))
-
+            ############################################################################################
             self.conv3_1 = depthwise_separable_conv2d('conv_ds_4', self.conv2_2,
                                                       width_multiplier=self.args.width_multiplier,
                                                       num_filters=128, kernel_size=(3, 3), padding='SAME',
@@ -132,7 +129,7 @@ class MobileNet:
                                                       is_training=self.is_training,
                                                       l2_strength=self.args.l2_strength,
                                                       biases=(self.args.bias, self.args.bias))
-
+            ############################################################################################
             self.conv4_1 = depthwise_separable_conv2d('conv_ds_6', self.conv3_2,
                                                       width_multiplier=self.args.width_multiplier,
                                                       num_filters=256, kernel_size=(3, 3), padding='SAME',
@@ -151,7 +148,7 @@ class MobileNet:
                                                       is_training=self.is_training,
                                                       l2_strength=self.args.l2_strength,
                                                       biases=(self.args.bias, self.args.bias))
-
+            ############################################################################################
             self.conv5_1 = depthwise_separable_conv2d('conv_ds_8', self.conv4_2,
                                                       width_multiplier=self.args.width_multiplier,
                                                       num_filters=512, kernel_size=(3, 3), padding='SAME',
@@ -206,7 +203,7 @@ class MobileNet:
                                                       is_training=self.is_training,
                                                       l2_strength=self.args.l2_strength,
                                                       biases=(self.args.bias, self.args.bias))
-
+            ############################################################################################
             self.conv6_1 = depthwise_separable_conv2d('conv_ds_14', self.conv5_6,
                                                       width_multiplier=self.args.width_multiplier,
                                                       num_filters=1024, kernel_size=(3, 3), padding='SAME',
@@ -216,7 +213,7 @@ class MobileNet:
                                                       is_training=self.is_training,
                                                       l2_strength=self.args.l2_strength,
                                                       biases=(self.args.bias, self.args.bias))
-
+            ############################################################################################
             self.avg_pool = avg_pool_2d(self.conv6_1, size=(7, 7), stride=(1, 1))
             self.logits = flatten(conv2d('fc', self.avg_pool, kernel_size=(1, 1), num_filters=self.args.num_classes,
                                          l2_strength=self.args.l2_strength,
@@ -229,6 +226,7 @@ class MobileNet:
                 tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.logits, labels=self.y, name='loss'))
             self.loss = self.regularization_loss + self.cross_entropy_loss
 
+            # Important for Batch Normalization
             update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
             with tf.control_dependencies(update_ops):
                 self.train_op = tf.train.AdamOptimizer(learning_rate=self.args.learning_rate).minimize(self.loss)
@@ -236,6 +234,7 @@ class MobileNet:
 
             self.accuracy = tf.reduce_mean(tf.cast(tf.equal(self.y, self.y_out_argmax), tf.float32))
 
+        # Summaries needed for TensorBoard
         with tf.name_scope('train-summary-per-iteration'):
             tf.summary.scalar('loss', self.loss)
             tf.summary.scalar('acc', self.accuracy)
@@ -243,17 +242,22 @@ class MobileNet:
 
     def __restore(self, file_name, sess):
         variables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="mobilenet_encoder")
-        dict = load_obj(file_name)
-        for variable in variables:
-            for key, value in dict.items():
-                if key in variable.name:
-                    sess.run(tf.assign(variable, value))
+        try:
+            print("Loading ImageNet pretrained weights...")
+            dict = load_obj(file_name)
+            run_list = []
+            for variable in variables:
+                for key, value in dict.items():
+                    run_list.append(tf.assign(variable, value))
+
+            sess.run(run_list)
+            print("ImageNet Pretrained Weights Loaded Initially\n\n")
+        except KeyboardInterrupt:
+            print("No pretrained ImageNet weights exist. Skipping...\n\n")
 
     def load_pretrained_weights(self, sess):
-        print("Loading ImageNet Pretrained Weights...")
         # self.__convert_graph_names(os.path.realpath('pretrained_weights/mobilenet_v1_vanilla.pkl'))
         self.__restore(self.pretrained_path, sess)
-        print("ImageNet Pretrained Weights Loaded Initially")
 
     def __convert_graph_names(self, path):
         """

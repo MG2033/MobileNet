@@ -43,10 +43,7 @@ class Train:
         print("Checkpoint Saved\n\n")
 
     def __load_model(self):
-        try:
-            self.model.load_pretrained_weights(self.sess)
-        except KeyboardInterrupt:
-            print("Original pretrained weights file doesn't exist. Training on your own.\n\n")
+        self.model.load_pretrained_weights(self.sess)
 
         latest_checkpoint = tf.train.latest_checkpoint(self.args.checkpoint_dir)
         if latest_checkpoint:

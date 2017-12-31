@@ -39,9 +39,6 @@ def create_experiment_dirs(exp_dir):
     experiment_dir = os.path.realpath(os.path.join(os.path.dirname(__file__))) + "/experiments/" + exp_dir + "/"
     summary_dir = experiment_dir + 'summaries/'
     checkpoint_dir = experiment_dir + 'checkpoints/'
-    # output_dir = experiment_dir + 'output/'
-    # test_dir = experiment_dir + 'test/'
-    # dirs = [summary_dir, checkpoint_dir, output_dir, test_dir]
     dirs = [summary_dir, checkpoint_dir]
     try:
         for dir_ in dirs:
