@@ -31,7 +31,7 @@ class Train:
         print("Initializing the model...")
         self.init = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
         self.sess.run(self.init)
-        print("Model initialized\n\n")
+        print("Model initialized successfully\n\n")
 
     def save_model(self):
         """
@@ -148,7 +148,7 @@ class Train:
             loss, acc, argmax = self.sess.run(
                 [self.model.loss, self.model.accuracy, self.model.y_out_argmax],
                 feed_dict=feed_dict)
-            print(argmax)
+            print("Predicted class is: " + str(argmax))
             # Append loss and accuracy
             loss_list += [loss]
             acc_list += [acc]

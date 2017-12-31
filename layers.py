@@ -241,6 +241,22 @@ def dense(name, x, w=None, output_dim=128, initializer=tf.contrib.layers.xavier_
     return dense_o
 
 
+def dropout(x, dropout_keep_prob, is_training):
+    """Dropout special layer"""
+
+    def dropout_with_keep():
+        return tf.nn.dropout(x, dropout_keep_prob)
+
+    def dropout_no_keep():
+        return tf.nn.dropout(x, 1.0)
+
+    if dropout_keep_prob != -1:
+        output = tf.cond(is_training, dropout_with_keep, dropout_no_keep)
+    else:
+        output = x
+    return output
+
+
 def flatten(x):
     """
     Flatten a (N,H,W,C) input into (N,D) output. Used for fully connected layers after conolution layers

@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class DataLoader:
@@ -24,19 +25,17 @@ class DataLoader:
         self.batch_size = batch_size
 
     def load_data(self):
-        # For going in the same experiment as the paper. Resizing the input image data to 224x224 is done.
+        # Please make sure to change this function to load your train/validation/test data.
         train_data = np.load("./data/tiny-image-net-200/tiny-image-net-200-train.npz")
         self.X_train = train_data['arr_0']
         self.y_train = train_data['arr_1']
         self.X_mean = np.mean(self.X_train, axis=0)
-        train_data = None
 
-        import matplotlib.pyplot as plt
-        val_data = np.array([plt.imread('./data/tiny-image-net-200/0.jpg')])
+        val_data = np.array([plt.imread('./data/test_images/2.jpg'), plt.imread('./data/test_images/2.jpg'),
+                             plt.imread('./data/test_images/2.jpg')])
 
         self.X_val = val_data
-        self.y_val = np.array([0])
-        val_data = None
+        self.y_val = np.array([281, 281, 281])
 
         self.train_data_len = self.X_train.shape[0]
         self.val_data_len = self.X_val.shape[0]

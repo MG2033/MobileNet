@@ -9,6 +9,7 @@
   "bias": 0.0,
   "learning_rate": 1e-3,
   "batchnorm_enabled": true,
+  "dropout_keep_prob": 0.999,
   "pretrained_path": "pretrained_weights/mobilenet_v1.pkl",
   "max_to_keep": 4,
   "save_model_every": 5,

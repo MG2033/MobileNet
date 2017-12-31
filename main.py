@@ -36,7 +36,6 @@ def main():
     print("Building the model...")
     model = MobileNet(config_args)
     print("Model is built successfully\n\n")
-    exit(1)
 
     # Summarizer creation
     summarizer = Summarizer(sess, config_args.summary_dir)

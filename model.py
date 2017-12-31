@@ -1,5 +1,5 @@
 import tensorflow as tf
-from layers import depthwise_separable_conv2d, conv2d, avg_pool_2d, dense, flatten
+from layers import depthwise_separable_conv2d, conv2d, avg_pool_2d, dense, flatten, dropout
 import os
 from utils import load_obj, save_obj
 import numpy as np
@@ -215,9 +215,10 @@ class MobileNet:
                                                       biases=(self.args.bias, self.args.bias))
             ############################################################################################
             self.avg_pool = avg_pool_2d(self.conv6_1, size=(7, 7), stride=(1, 1))
-            self.logits = flatten(conv2d('fc', self.avg_pool, kernel_size=(1, 1), num_filters=self.args.num_classes,
-                                         l2_strength=self.args.l2_strength,
-                                         bias=self.args.bias))
+            self.dropped = dropout(self.avg_pool, self.args.dropout_keep_prob, self.is_training)
+            self.logits = flatten(conv2d('fc', self.dropped, kernel_size=(1, 1), num_filters=self.args.num_classes,
+                                 l2_strength=self.args.l2_strength,
+                                 bias=self.args.bias))
 
     def __init_output(self):
         with tf.variable_scope('output'):
@@ -241,14 +242,15 @@ class MobileNet:
             self.summaries_merged = tf.summary.merge_all()
 
     def __restore(self, file_name, sess):
-        variables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="mobilenet_encoder")
         try:
             print("Loading ImageNet pretrained weights...")
+            variables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="mobilenet_encoder")
             dict = load_obj(file_name)
             run_list = []
             for variable in variables:
                 for key, value in dict.items():
-                    run_list.append(tf.assign(variable, value))
+                    if key in variable.name:
+                        run_list.append(tf.assign(variable, value))
 
             sess.run(run_list)
             print("ImageNet Pretrained Weights Loaded Initially\n\n")
