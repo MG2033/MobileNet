@@ -244,7 +244,7 @@ class MobileNet:
     def __restore(self, file_name, sess):
         try:
             print("Loading ImageNet pretrained weights...")
-            variables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+            variables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='mobilenet_encoder')
             dict = load_obj(file_name)
             run_list = []
             for variable in variables:
@@ -258,7 +258,7 @@ class MobileNet:
             print("No pretrained ImageNet weights exist. Skipping...\n\n")
 
     def load_pretrained_weights(self, sess):
-        self.__convert_graph_names(os.path.realpath('pretrained_weights/mobilenet_v1_vanilla.pkl'))
+        # self.__convert_graph_names(os.path.realpath('pretrained_weights/mobilenet_v1_vanilla.pkl'))
         self.__restore(self.pretrained_path, sess)
 
     def __convert_graph_names(self, path):
@@ -271,6 +271,7 @@ class MobileNet:
         dict = load_obj(path)
         variables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='mobilenet_encoder')
         dict_output = {}
+        count = 0
         for key, value in dict.items():
             for variable in variables:
                 for i in range(15):
@@ -313,6 +314,7 @@ class MobileNet:
                                 print(variable.name, key)
                                 print(variable.shape, dict[key].shape)
                                 print("\n")
+                                count += 1
                         elif key.find(
                                 "Conv2d_0/") != -1 and variable.name.find("conv_1/") != -1:
                             if (key.find("weights") != -1 and variable.name.find("weights") != -1) \
@@ -322,10 +324,21 @@ class MobileNet:
                                     or (key.find("moving_mean") != -1 and variable.name.find("moving_mean") != -1) \
                                     or (key.find("moving_variance") != -1 and variable.name.find(
                                         "moving_variance") != -1):
+                                if i ==0 and j == 0:
+                                    print(variable.name, key)
+                                    print(variable.shape, dict[key].shape)
+                                    print("\n")
+                                    count += 1
                                 dict_output[variable.name] = value
                         elif key.find("Logits") != -1 and variable.name.find("fc") != -1:
                             if (key.find("weights") != -1 and variable.name.find("weights") != -1) \
                                     or (key.find("biases") != -1 and variable.name.find("biases") != -1):
+                                if i ==0 and j == 0:
+                                    print(variable.name, key)
+                                    print(variable.shape, dict[key].shape)
+                                    print("\n")
+                                    count += 1
                                 dict_output[variable.name] = value
+        print(count)
         save_obj(dict_output, self.pretrained_path)
         print("Pretrained weights converted to the new structure. The filename is mobilenet_v1.pkl.")
