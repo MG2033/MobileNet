@@ -31,11 +31,17 @@ class DataLoader:
         self.y_train = train_data['arr_1']
         self.X_mean = np.mean(self.X_train, axis=0)
 
-        val_data = np.array([plt.imread('./data/test_images/2.jpg'), plt.imread('./data/test_images/2.jpg'),
-                             plt.imread('./data/test_images/2.jpg')])
+        img_mean = np.ones((1, 224, 224, 3))
+        img_mean[:, :, :, 0] *= 103.939
+        img_mean[:, :, :, 1] *= 116.779
+        img_mean[:, :, :, 2] *= 123.68
+
+        val_data = np.array([(plt.imread('./data/test_images/2.jpg')-img_mean[0])/255.0])
+
+
 
         self.X_val = val_data
-        self.y_val = np.array([281, 281, 281])
+        self.y_val = np.array([281])
 
         self.train_data_len = self.X_train.shape[0]
         self.val_data_len = self.X_val.shape[0]

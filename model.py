@@ -83,11 +83,11 @@ class MobileNet:
     def __init_network(self):
         with tf.variable_scope('mobilenet_encoder'):
             # Preprocessing as done in the paper
-            with tf.name_scope('pre_processing'):
-                preprocessed_input = (self.X - self.mean_img) / 255.0
+            # with tf.name_scope('pre_processing'):
+            #     preprocessed_input = (self.X - self.mean_img) / 255.0
 
             # Model is here!
-            self.conv1_1 = conv2d('conv_1', preprocessed_input, num_filters=int(round(32 * self.args.width_multiplier)),
+            self.conv1_1 = conv2d('conv_1', self.X, num_filters=int(round(32 * self.args.width_multiplier)),
                                   kernel_size=(3, 3),
                                   padding='SAME', stride=(2, 2), activation=tf.nn.relu,
                                   batchnorm_enabled=self.args.batchnorm_enabled,
@@ -217,8 +217,8 @@ class MobileNet:
             self.avg_pool = avg_pool_2d(self.conv6_1, size=(7, 7), stride=(1, 1))
             self.dropped = dropout(self.avg_pool, self.args.dropout_keep_prob, self.is_training)
             self.logits = flatten(conv2d('fc', self.dropped, kernel_size=(1, 1), num_filters=self.args.num_classes,
-                                 l2_strength=self.args.l2_strength,
-                                 bias=self.args.bias))
+                                         l2_strength=self.args.l2_strength,
+                                         bias=self.args.bias))
 
     def __init_output(self):
         with tf.variable_scope('output'):
@@ -244,7 +244,7 @@ class MobileNet:
     def __restore(self, file_name, sess):
         try:
             print("Loading ImageNet pretrained weights...")
-            variables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="mobilenet_encoder")
+            variables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
             dict = load_obj(file_name)
             run_list = []
             for variable in variables:
@@ -258,7 +258,7 @@ class MobileNet:
             print("No pretrained ImageNet weights exist. Skipping...\n\n")
 
     def load_pretrained_weights(self, sess):
-        # self.__convert_graph_names(os.path.realpath('pretrained_weights/mobilenet_v1_vanilla.pkl'))
+        self.__convert_graph_names(os.path.realpath('pretrained_weights/mobilenet_v1_vanilla.pkl'))
         self.__restore(self.pretrained_path, sess)
 
     def __convert_graph_names(self, path):
@@ -269,42 +269,63 @@ class MobileNet:
         :return: None
         """
         dict = load_obj(path)
-        variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='mobilenet_encoder')
+        variables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='mobilenet_encoder')
         dict_output = {}
-
         for key, value in dict.items():
             for variable in variables:
-                for i in range(len(dict)):
-                    for j in range(len(variables)):
+                for i in range(15):
+                    for j in range(15):
                         if ((key.find("Conv2d_" + str(i) + "_") != -1 and variable.name.find(
                                         "conv_ds_" + str(j) + "/") != -1) and i + 1 == j):
-                            if key.find("depthwise") != -1 and variable.name.find(
-                                    "depthwise") != -1 and (key.find("gamma") != -1 and variable.name.find(
+                            if ((key.find("depthwise") != -1 and variable.name.find(
+                                    "depthwise") != -1) and (key.find("gamma") != -1 and variable.name.find(
                                 "gamma") != -1 or key.find("beta") != -1 and variable.name.find(
-                                "beta") != -1) or key.find("pointwise") != -1 and variable.name.find(
-                                "pointwise") != -1 and (key.find("gamma") != -1 and variable.name.find(
-                                "gamma") != -1 or key.find("beta") != -1 and variable.name.find(
-                                "beta") != -1) or key.find("pointwise/weights") != -1 and variable.name.find(
-                                "pointwise/weights") != -1 or key.find(
-                                "depthwise_weights") != -1 and variable.name.find(
-                                "depthwise/weights") != -1 or key.find("pointwise/biases") != -1 and variable.name.find(
-                                "pointwise/biases") != -1 or key.find("depthwise/biases") != -1 and variable.name.find(
-                                "depthwise/biases") != -1 or key.find("1x1/weights") != -1 and variable.name.find(
-                                "1x1/weights") != -1 or key.find("1x1/biases") != -1 and variable.name.find(
-                                "1x1/biases") != -1:
+                                "beta") != -1 or key.find("moving_mean") != -1 and variable.name.find(
+                                "moving_mean") != -1
+                                                             or key.find(
+                                    "moving_variance") != -1 and variable.name.find("moving_variance") != -1)) \
+ \
+                                    or ((key.find("pointwise") != -1 and variable.name.find(
+                                        "pointwise") != -1) and (key.find("gamma") != -1 and variable.name.find(
+                                        "gamma") != -1 or key.find("beta") != -1 and variable.name.find(
+                                        "beta") != -1 or key.find("moving_mean") != -1 and variable.name.find(
+                                        "moving_mean") != -1 or key.find(
+                                        "moving_variance") != -1 and variable.name.find("moving_variance") != -1)) \
+ \
+                                    or (key.find("pointwise/weights") != -1 and variable.name.find(
+                                        "pointwise/weights") != -1) \
+ \
+                                    or (key.find(
+                                        "depthwise_weights") != -1 and variable.name.find(
+                                        "depthwise/weights") != -1) \
+ \
+                                    or (key.find("pointwise/biases") != -1 and variable.name.find(
+                                        "pointwise/biases") != -1) \
+ \
+                                    or (key.find("depthwise/biases") != -1 and variable.name.find(
+                                        "depthwise/biases") != -1) \
+                                    or (key.find("1x1/weights") != -1 and variable.name.find(
+                                        "1x1/weights") != -1) \
+ \
+                                    or (key.find("1x1/biases") != -1 and variable.name.find(
+                                        "1x1/biases") != -1):
                                 dict_output[variable.name] = value
+                                print(variable.name, key)
+                                print(variable.shape, dict[key].shape)
+                                print("\n")
                         elif key.find(
                                 "Conv2d_0/") != -1 and variable.name.find("conv_1/") != -1:
-                            if key.find("weights") != -1 and variable.name.find("weights") != -1 or key.find(
-                                    "biases") != -1 and variable.name.find(
-                                "biases") != -1 or key.find("beta") != -1 and variable.name.find(
-                                "beta") != -1 or key.find("gamma") != -1 and variable.name.find(
-                                "gamma") != -1:
+                            if (key.find("weights") != -1 and variable.name.find("weights") != -1) \
+                                    or (key.find("biases") != -1 and variable.name.find("biases") != -1) \
+                                    or (key.find("beta") != -1 and variable.name.find("beta") != -1) \
+                                    or (key.find("gamma") != -1 and variable.name.find("gamma") != -1) \
+                                    or (key.find("moving_mean") != -1 and variable.name.find("moving_mean") != -1) \
+                                    or (key.find("moving_variance") != -1 and variable.name.find(
+                                        "moving_variance") != -1):
                                 dict_output[variable.name] = value
                         elif key.find("Logits") != -1 and variable.name.find("fc") != -1:
-                            if key.find("weights") != -1 and variable.name.find("weights") != -1 or key.find(
-                                    "biases") != -1 and variable.name.find("biases") != -1:
+                            if (key.find("weights") != -1 and variable.name.find("weights") != -1) \
+                                    or (key.find("biases") != -1 and variable.name.find("biases") != -1):
                                 dict_output[variable.name] = value
-
         save_obj(dict_output, self.pretrained_path)
         print("Pretrained weights converted to the new structure. The filename is mobilenet_v1.pkl.")

@@ -145,9 +145,10 @@ class Train:
                          self.model.is_training: False
                          }
             # Run the feed_forward
-            loss, acc, argmax = self.sess.run(
-                [self.model.loss, self.model.accuracy, self.model.y_out_argmax],
+            loss, acc, argmax, logits = self.sess.run(
+                [self.model.loss, self.model.accuracy, self.model.y_out_argmax, self.model.logits],
                 feed_dict=feed_dict)
+            print(logits)
             print("Predicted class is: " + str(argmax))
             # Append loss and accuracy
             loss_list += [loss]
