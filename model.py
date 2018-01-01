@@ -271,7 +271,6 @@ class MobileNet:
         dict = load_obj(path)
         variables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='mobilenet_encoder')
         dict_output = {}
-        count = 0
         for key, value in dict.items():
             for variable in variables:
                 for i in range(15):
@@ -314,7 +313,6 @@ class MobileNet:
                                 print(variable.name, key)
                                 print(variable.shape, dict[key].shape)
                                 print("\n")
-                                count += 1
                         elif key.find(
                                 "Conv2d_0/") != -1 and variable.name.find("conv_1/") != -1:
                             if (key.find("weights") != -1 and variable.name.find("weights") != -1) \
@@ -328,7 +326,6 @@ class MobileNet:
                                     print(variable.name, key)
                                     print(variable.shape, dict[key].shape)
                                     print("\n")
-                                    count += 1
                                 dict_output[variable.name] = value
                         elif key.find("Logits") != -1 and variable.name.find("fc") != -1:
                             if (key.find("weights") != -1 and variable.name.find("weights") != -1) \
@@ -337,8 +334,6 @@ class MobileNet:
                                     print(variable.name, key)
                                     print(variable.shape, dict[key].shape)
                                     print("\n")
-                                    count += 1
                                 dict_output[variable.name] = value
-        print(count)
         save_obj(dict_output, self.pretrained_path)
         print("Pretrained weights converted to the new structure. The filename is mobilenet_v1.pkl.")
