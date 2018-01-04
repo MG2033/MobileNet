@@ -11,6 +11,9 @@ This implementation was made to be clearer than TensorFlow original implementati
 <img src="https://github.com/MG2033/MobileNet/blob/master/figures/dws.png"><br><br>
 </div>
 
+## ReLU6
+The paper uses ReLU6 as an activation function. ReLU6 was first introduced in [Convolutional Deep Belief Networks on CIFAR-10](https://www.cs.toronto.edu/~kriz/conv-cifar10-aug2010.pdf) as a mobile ReLU.
+
 ## Usage
 ### Main Dependencies
  ```
