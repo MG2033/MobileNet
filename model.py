@@ -62,13 +62,13 @@ class MobileNet:
     def __init_network(self):
         with tf.variable_scope('mobilenet_encoder'):
             # Preprocessing as done in the paper
-            # with tf.name_scope('pre_processing'):
-            #     preprocessed_input = (self.X - self.mean_img) / 255.0
+            with tf.name_scope('pre_processing'):
+                preprocessed_input = (self.X - self.mean_img) / 255.0
 
             # Model is here!
-            conv1_1 = conv2d('conv_1', self.X, num_filters=int(round(32 * self.args.width_multiplier)),
+            conv1_1 = conv2d('conv_1', preprocessed_input, num_filters=int(round(32 * self.args.width_multiplier)),
                              kernel_size=(3, 3),
-                             padding='SAME', stride=(2, 2), activation=tf.nn.relu,
+                             padding='SAME', stride=(2, 2), activation=tf.nn.relu6,
                              batchnorm_enabled=self.args.batchnorm_enabled,
                              is_training=self.is_training, l2_strength=self.args.l2_strength, bias=self.args.bias)
             self._add_to_nodes([conv1_1])
@@ -78,7 +78,7 @@ class MobileNet:
                                                                 num_filters=64, kernel_size=(3, 3), padding='SAME',
                                                                 stride=(1, 1),
                                                                 batchnorm_enabled=self.args.batchnorm_enabled,
-                                                                activation=tf.nn.relu,
+                                                                activation=tf.nn.relu6,
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
@@ -89,7 +89,7 @@ class MobileNet:
                                                                 num_filters=128, kernel_size=(3, 3), padding='SAME',
                                                                 stride=(2, 2),
                                                                 batchnorm_enabled=self.args.batchnorm_enabled,
-                                                                activation=tf.nn.relu,
+                                                                activation=tf.nn.relu6,
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
@@ -100,7 +100,7 @@ class MobileNet:
                                                                 num_filters=128, kernel_size=(3, 3), padding='SAME',
                                                                 stride=(1, 1),
                                                                 batchnorm_enabled=self.args.batchnorm_enabled,
-                                                                activation=tf.nn.relu,
+                                                                activation=tf.nn.relu6,
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
@@ -111,7 +111,7 @@ class MobileNet:
                                                                 num_filters=256, kernel_size=(3, 3), padding='SAME',
                                                                 stride=(2, 2),
                                                                 batchnorm_enabled=self.args.batchnorm_enabled,
-                                                                activation=tf.nn.relu,
+                                                                activation=tf.nn.relu6,
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
@@ -122,7 +122,7 @@ class MobileNet:
                                                                 num_filters=256, kernel_size=(3, 3), padding='SAME',
                                                                 stride=(1, 1),
                                                                 batchnorm_enabled=self.args.batchnorm_enabled,
-                                                                activation=tf.nn.relu,
+                                                                activation=tf.nn.relu6,
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
@@ -133,7 +133,7 @@ class MobileNet:
                                                                 num_filters=512, kernel_size=(3, 3), padding='SAME',
                                                                 stride=(2, 2),
                                                                 batchnorm_enabled=self.args.batchnorm_enabled,
-                                                                activation=tf.nn.relu,
+                                                                activation=tf.nn.relu6,
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
@@ -144,7 +144,7 @@ class MobileNet:
                                                                 num_filters=512, kernel_size=(3, 3), padding='SAME',
                                                                 stride=(1, 1),
                                                                 batchnorm_enabled=self.args.batchnorm_enabled,
-                                                                activation=tf.nn.relu,
+                                                                activation=tf.nn.relu6,
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
@@ -155,7 +155,7 @@ class MobileNet:
                                                                 num_filters=512, kernel_size=(3, 3), padding='SAME',
                                                                 stride=(1, 1),
                                                                 batchnorm_enabled=self.args.batchnorm_enabled,
-                                                                activation=tf.nn.relu,
+                                                                activation=tf.nn.relu6,
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
@@ -166,7 +166,7 @@ class MobileNet:
                                                                 num_filters=512, kernel_size=(3, 3), padding='SAME',
                                                                 stride=(1, 1),
                                                                 batchnorm_enabled=self.args.batchnorm_enabled,
-                                                                activation=tf.nn.relu,
+                                                                activation=tf.nn.relu6,
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
@@ -177,7 +177,7 @@ class MobileNet:
                                                                 num_filters=512, kernel_size=(3, 3), padding='SAME',
                                                                 stride=(1, 1),
                                                                 batchnorm_enabled=self.args.batchnorm_enabled,
-                                                                activation=tf.nn.relu,
+                                                                activation=tf.nn.relu6,
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
@@ -188,7 +188,7 @@ class MobileNet:
                                                                 num_filters=512, kernel_size=(3, 3), padding='SAME',
                                                                 stride=(1, 1),
                                                                 batchnorm_enabled=self.args.batchnorm_enabled,
-                                                                activation=tf.nn.relu,
+                                                                activation=tf.nn.relu6,
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
@@ -199,7 +199,7 @@ class MobileNet:
                                                                 num_filters=1024, kernel_size=(3, 3), padding='SAME',
                                                                 stride=(2, 2),
                                                                 batchnorm_enabled=self.args.batchnorm_enabled,
-                                                                activation=tf.nn.relu,
+                                                                activation=tf.nn.relu6,
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
@@ -210,7 +210,7 @@ class MobileNet:
                                                                 num_filters=1024, kernel_size=(3, 3), padding='SAME',
                                                                 stride=(1, 1),
                                                                 batchnorm_enabled=self.args.batchnorm_enabled,
-                                                                activation=tf.nn.relu,
+                                                                activation=tf.nn.relu6,
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
@@ -254,93 +254,14 @@ class MobileNet:
                 for key, value in dict.items():
                     if key in variable.name:
                         run_list.append(tf.assign(variable, value))
-
             sess.run(run_list)
             print("ImageNet Pretrained Weights Loaded Initially\n\n")
-        except KeyboardInterrupt:
+        except:
             print("No pretrained ImageNet weights exist. Skipping...\n\n")
 
     def load_pretrained_weights(self, sess):
-        # self.__convert_graph_names(os.path.realpath('pretrained_weights/mobilenet_v1_vanilla.pkl'))
         self.__restore(self.pretrained_path, sess)
 
     def _add_to_nodes(self, nodes):
         for node in nodes:
             self.nodes[node.name] = node
-
-    def __convert_graph_names(self, path):
-        """
-        This function is to convert from the mobilenet original model pretrained weights structure to our
-        model pretrained weights structure.
-        :param path: (string) path to the original pretrained weights .pkl file
-        :return: None
-        """
-        dict = load_obj(path)
-        variables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='mobilenet_encoder')
-        dict_output = {}
-        for key, value in dict.items():
-            for variable in variables:
-                for i in range(15):
-                    for j in range(15):
-                        if ((key.find("Conv2d_" + str(i) + "_") != -1 and variable.name.find(
-                                        "conv_ds_" + str(j) + "/") != -1) and i + 1 == j):
-                            if ((key.find("depthwise") != -1 and variable.name.find(
-                                    "depthwise") != -1) and (key.find("gamma") != -1 and variable.name.find(
-                                "gamma") != -1 or key.find("beta") != -1 and variable.name.find(
-                                "beta") != -1 or key.find("moving_mean") != -1 and variable.name.find(
-                                "moving_mean") != -1
-                                                             or key.find(
-                                    "moving_variance") != -1 and variable.name.find("moving_variance") != -1)) \
- \
-                                    or ((key.find("pointwise") != -1 and variable.name.find(
-                                        "pointwise") != -1) and (key.find("gamma") != -1 and variable.name.find(
-                                        "gamma") != -1 or key.find("beta") != -1 and variable.name.find(
-                                        "beta") != -1 or key.find("moving_mean") != -1 and variable.name.find(
-                                        "moving_mean") != -1 or key.find(
-                                        "moving_variance") != -1 and variable.name.find("moving_variance") != -1)) \
- \
-                                    or (key.find("pointwise/weights") != -1 and variable.name.find(
-                                        "pointwise/weights") != -1) \
- \
-                                    or (key.find(
-                                        "depthwise_weights") != -1 and variable.name.find(
-                                        "depthwise/weights") != -1) \
- \
-                                    or (key.find("pointwise/biases") != -1 and variable.name.find(
-                                        "pointwise/biases") != -1) \
- \
-                                    or (key.find("depthwise/biases") != -1 and variable.name.find(
-                                        "depthwise/biases") != -1) \
-                                    or (key.find("1x1/weights") != -1 and variable.name.find(
-                                        "1x1/weights") != -1) \
- \
-                                    or (key.find("1x1/biases") != -1 and variable.name.find(
-                                        "1x1/biases") != -1):
-                                dict_output[variable.name] = value
-                                print(variable.name, key)
-                                print(variable.shape, dict[key].shape)
-                                print("\n")
-                        elif key.find(
-                                "Conv2d_0/") != -1 and variable.name.find("conv_1/") != -1:
-                            if (key.find("weights") != -1 and variable.name.find("weights") != -1) \
-                                    or (key.find("biases") != -1 and variable.name.find("biases") != -1) \
-                                    or (key.find("beta") != -1 and variable.name.find("beta") != -1) \
-                                    or (key.find("gamma") != -1 and variable.name.find("gamma") != -1) \
-                                    or (key.find("moving_mean") != -1 and variable.name.find("moving_mean") != -1) \
-                                    or (key.find("moving_variance") != -1 and variable.name.find(
-                                        "moving_variance") != -1):
-                                if i == 0 and j == 0:
-                                    print(variable.name, key)
-                                    print(variable.shape, dict[key].shape)
-                                    print("\n")
-                                dict_output[variable.name] = value
-                        elif key.find("Logits") != -1 and variable.name.find("fc") != -1:
-                            if (key.find("weights") != -1 and variable.name.find("weights") != -1) \
-                                    or (key.find("biases") != -1 and variable.name.find("biases") != -1):
-                                if i == 0 and j == 0:
-                                    print(variable.name, key)
-                                    print(variable.shape, dict[key].shape)
-                                    print("\n")
-                                dict_output[variable.name] = value
-        save_obj(dict_output, self.pretrained_path)
-        print("Pretrained weights converted to the new structure. The filename is mobilenet_v1.pkl.")

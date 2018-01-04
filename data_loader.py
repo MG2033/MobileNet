@@ -8,7 +8,6 @@ class DataLoader:
 
     def __init__(self, batch_size, shuffle=False):
         self.X_train = None
-        self.X_mean = None
         self.y_train = None
         self.img_mean = None
         self.train_data_len = 0
@@ -26,22 +25,14 @@ class DataLoader:
 
     def load_data(self):
         # Please make sure to change this function to load your train/validation/test data.
-        train_data = np.load("./data/tiny-image-net-200/tiny-image-net-200-train.npz")
-        self.X_train = train_data['arr_0']
-        self.y_train = train_data['arr_1']
-        self.X_mean = np.mean(self.X_train, axis=0)
+        train_data = np.expand_dims(plt.imread('./data/test_images/3.jpg'), axis=0)
+        self.X_train = train_data
+        self.y_train = np.array([682])
 
-        img_mean = np.ones((1, 224, 224, 3))
-        img_mean[:, :, :, 0] *= 103.939
-        img_mean[:, :, :, 1] *= 116.779
-        img_mean[:, :, :, 2] *= 123.68
-
-        val_data = np.expand_dims((plt.imread('./data/test_images/2.jpg') - img_mean[0]) / 255.0, axis=0)
-
-
+        val_data = np.expand_dims(plt.imread('./data/test_images/3.jpg'), axis=0)
 
         self.X_val = val_data
-        self.y_val = np.array([281])
+        self.y_val = np.array([682])
 
         self.train_data_len = self.X_train.shape[0]
         self.val_data_len = self.X_val.shape[0]
