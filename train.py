@@ -145,10 +145,14 @@ class Train:
                          self.model.is_training: False
                          }
             # Run the feed_forward
-            loss, acc, argmax, logits = self.sess.run(
-                [self.model.loss, self.model.accuracy, self.model.y_out_argmax, self.model.logits],
+            loss, acc, argmax, nodes = self.sess.run(
+                [self.model.loss, self.model.accuracy, self.model.y_out_argmax, self.model.nodes],
                 feed_dict=feed_dict)
-            print(logits)
+            import pickle
+            with open('mine.pkl', 'wb') as file:
+                pickle.dump(nodes, file)
+            for key, value in nodes.items():
+                print(key)
             print("Predicted class is: " + str(argmax))
             # Append loss and accuracy
             loss_list += [loss]

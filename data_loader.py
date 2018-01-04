@@ -36,7 +36,7 @@ class DataLoader:
         img_mean[:, :, :, 1] *= 116.779
         img_mean[:, :, :, 2] *= 123.68
 
-        val_data = np.array([(plt.imread('./data/test_images/2.jpg')-img_mean[0])/255.0])
+        val_data = np.expand_dims((plt.imread('./data/test_images/2.jpg') - img_mean[0]) / 255.0, axis=0)
 
 
 

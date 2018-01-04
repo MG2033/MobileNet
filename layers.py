@@ -159,7 +159,7 @@ def depthwise_separable_conv2d(name, x, w_depthwise=None, w_pointwise=None, widt
                         initializer=initializer, l2_strength=l2_strength, bias=biases[1], activation=activation,
                         batchnorm_enabled=batchnorm_enabled, is_training=is_training)
 
-    return conv_o
+    return conv_a, conv_o
 
 
 ############################################################################################################
