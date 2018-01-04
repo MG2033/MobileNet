@@ -54,6 +54,8 @@ class MobileNet:
         self.mean_img = tf.constant(img_mean, dtype=tf.float32)
 
     def __build(self):
+        self.__init_global_epoch()
+        self.__init_global_step()
         self.__init_mean()
         self.__init_input()
         self.__init_network()
@@ -71,7 +73,7 @@ class MobileNet:
                              padding='SAME', stride=(2, 2), activation=tf.nn.relu6,
                              batchnorm_enabled=self.args.batchnorm_enabled,
                              is_training=self.is_training, l2_strength=self.args.l2_strength, bias=self.args.bias)
-            self._add_to_nodes([conv1_1])
+            self.__add_to_nodes([conv1_1])
             ############################################################################################
             conv2_1_dw, conv2_1_pw = depthwise_separable_conv2d('conv_ds_2', conv1_1,
                                                                 width_multiplier=self.args.width_multiplier,
@@ -82,7 +84,7 @@ class MobileNet:
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
-            self._add_to_nodes([conv2_1_dw, conv2_1_pw])
+            self.__add_to_nodes([conv2_1_dw, conv2_1_pw])
 
             conv2_2_dw, conv2_2_pw = depthwise_separable_conv2d('conv_ds_3', conv2_1_pw,
                                                                 width_multiplier=self.args.width_multiplier,
@@ -93,7 +95,7 @@ class MobileNet:
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
-            self._add_to_nodes([conv2_2_dw, conv2_2_pw])
+            self.__add_to_nodes([conv2_2_dw, conv2_2_pw])
             ############################################################################################
             conv3_1_dw, conv3_1_pw = depthwise_separable_conv2d('conv_ds_4', conv2_2_pw,
                                                                 width_multiplier=self.args.width_multiplier,
@@ -104,7 +106,7 @@ class MobileNet:
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
-            self._add_to_nodes([conv3_1_dw, conv3_1_pw])
+            self.__add_to_nodes([conv3_1_dw, conv3_1_pw])
 
             conv3_2_dw, conv3_2_pw = depthwise_separable_conv2d('conv_ds_5', conv3_1_pw,
                                                                 width_multiplier=self.args.width_multiplier,
@@ -115,7 +117,7 @@ class MobileNet:
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
-            self._add_to_nodes([conv3_2_dw, conv3_2_pw])
+            self.__add_to_nodes([conv3_2_dw, conv3_2_pw])
             ############################################################################################
             conv4_1_dw, conv4_1_pw = depthwise_separable_conv2d('conv_ds_6', conv3_2_pw,
                                                                 width_multiplier=self.args.width_multiplier,
@@ -126,7 +128,7 @@ class MobileNet:
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
-            self._add_to_nodes([conv4_1_dw, conv4_1_pw])
+            self.__add_to_nodes([conv4_1_dw, conv4_1_pw])
 
             conv4_2_dw, conv4_2_pw = depthwise_separable_conv2d('conv_ds_7', conv4_1_pw,
                                                                 width_multiplier=self.args.width_multiplier,
@@ -137,7 +139,7 @@ class MobileNet:
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
-            self._add_to_nodes([conv4_2_dw, conv4_2_pw])
+            self.__add_to_nodes([conv4_2_dw, conv4_2_pw])
             ############################################################################################
             conv5_1_dw, conv5_1_pw = depthwise_separable_conv2d('conv_ds_8', conv4_2_pw,
                                                                 width_multiplier=self.args.width_multiplier,
@@ -148,7 +150,7 @@ class MobileNet:
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
-            self._add_to_nodes([conv5_1_dw, conv5_1_pw])
+            self.__add_to_nodes([conv5_1_dw, conv5_1_pw])
 
             conv5_2_dw, conv5_2_pw = depthwise_separable_conv2d('conv_ds_9', conv5_1_pw,
                                                                 width_multiplier=self.args.width_multiplier,
@@ -159,7 +161,7 @@ class MobileNet:
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
-            self._add_to_nodes([conv5_2_dw, conv5_2_pw])
+            self.__add_to_nodes([conv5_2_dw, conv5_2_pw])
 
             conv5_3_dw, conv5_3_pw = depthwise_separable_conv2d('conv_ds_10', conv5_2_pw,
                                                                 width_multiplier=self.args.width_multiplier,
@@ -170,7 +172,7 @@ class MobileNet:
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
-            self._add_to_nodes([conv5_3_dw, conv5_3_pw])
+            self.__add_to_nodes([conv5_3_dw, conv5_3_pw])
 
             conv5_4_dw, conv5_4_pw = depthwise_separable_conv2d('conv_ds_11', conv5_3_pw,
                                                                 width_multiplier=self.args.width_multiplier,
@@ -181,7 +183,7 @@ class MobileNet:
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
-            self._add_to_nodes([conv5_4_dw, conv5_4_pw])
+            self.__add_to_nodes([conv5_4_dw, conv5_4_pw])
 
             conv5_5_dw, conv5_5_pw = depthwise_separable_conv2d('conv_ds_12', conv5_4_pw,
                                                                 width_multiplier=self.args.width_multiplier,
@@ -192,7 +194,7 @@ class MobileNet:
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
-            self._add_to_nodes([conv5_5_dw, conv5_5_pw])
+            self.__add_to_nodes([conv5_5_dw, conv5_5_pw])
 
             conv5_6_dw, conv5_6_pw = depthwise_separable_conv2d('conv_ds_13', conv5_5_pw,
                                                                 width_multiplier=self.args.width_multiplier,
@@ -203,7 +205,7 @@ class MobileNet:
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
-            self._add_to_nodes([conv5_6_dw, conv5_6_pw])
+            self.__add_to_nodes([conv5_6_dw, conv5_6_pw])
             ############################################################################################
             conv6_1_dw, conv6_1_pw = depthwise_separable_conv2d('conv_ds_14', conv5_6_pw,
                                                                 width_multiplier=self.args.width_multiplier,
@@ -214,14 +216,14 @@ class MobileNet:
                                                                 is_training=self.is_training,
                                                                 l2_strength=self.args.l2_strength,
                                                                 biases=(self.args.bias, self.args.bias))
-            self._add_to_nodes([conv6_1_dw, conv6_1_pw])
+            self.__add_to_nodes([conv6_1_dw, conv6_1_pw])
             ############################################################################################
             avg_pool = avg_pool_2d(conv6_1_pw, size=(7, 7), stride=(1, 1))
             dropped = dropout(avg_pool, self.args.dropout_keep_prob, self.is_training)
             self.logits = flatten(conv2d('fc', dropped, kernel_size=(1, 1), num_filters=self.args.num_classes,
                                          l2_strength=self.args.l2_strength,
                                          bias=self.args.bias))
-            self._add_to_nodes([avg_pool, dropped, self.logits])
+            self.__add_to_nodes([avg_pool, dropped, self.logits])
 
     def __init_output(self):
         with tf.variable_scope('output'):
@@ -262,6 +264,26 @@ class MobileNet:
     def load_pretrained_weights(self, sess):
         self.__restore(self.pretrained_path, sess)
 
-    def _add_to_nodes(self, nodes):
+    def __add_to_nodes(self, nodes):
         for node in nodes:
             self.nodes[node.name] = node
+
+    def __init_global_epoch(self):
+        """
+        Create a global epoch tensor to totally save the process of the training
+        :return:
+        """
+        with tf.variable_scope('global_epoch'):
+            self.global_epoch_tensor = tf.Variable(-1, trainable=False, name='global_epoch')
+            self.global_epoch_input = tf.placeholder('int32', None, name='global_epoch_input')
+            self.global_epoch_assign_op = self.global_epoch_tensor.assign(self.global_epoch_input)
+
+    def __init_global_step(self):
+        """
+        Create a global step variable to be a reference to the number of iterations
+        :return:
+        """
+        with tf.variable_scope('global_step'):
+            self.global_step_tensor = tf.Variable(0, trainable=False, name='global_step')
+            self.global_step_input = tf.placeholder('int32', None, name='global_step_input')
+            self.global_step_assign_op = self.global_step_tensor.assign(self.global_step_input)
