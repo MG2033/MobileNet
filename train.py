@@ -145,6 +145,7 @@ class Train:
                          self.model.is_training: False
                          }
             # Run the feed_forward
+            # Nodes are important for debugging as they dump all the graph!
             loss, acc, argmax, nodes = self.sess.run(
                 [self.model.loss, self.model.accuracy, self.model.y_out_argmax, self.model.nodes],
                 feed_dict=feed_dict)

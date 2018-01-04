@@ -25,14 +25,16 @@ class DataLoader:
 
     def load_data(self):
         # Please make sure to change this function to load your train/validation/test data.
-        train_data = np.expand_dims(plt.imread('./data/test_images/3.jpg'), axis=0)
+        train_data = np.array([plt.imread('./data/test_images/0.jpg'), plt.imread('./data/test_images/1.jpg'),
+                      plt.imread('./data/test_images/2.jpg'), plt.imread('./data/test_images/3.jpg')])
         self.X_train = train_data
-        self.y_train = np.array([682])
+        self.y_train = np.array([284, 264, 682, 2])
 
-        val_data = np.expand_dims(plt.imread('./data/test_images/3.jpg'), axis=0)
+        val_data = np.array([plt.imread('./data/test_images/0.jpg'), plt.imread('./data/test_images/1.jpg'),
+                    plt.imread('./data/test_images/2.jpg'), plt.imread('./data/test_images/3.jpg')])
 
         self.X_val = val_data
-        self.y_val = np.array([682])
+        self.y_val = np.array([284, 264, 682, 2])
 
         self.train_data_len = self.X_train.shape[0]
         self.val_data_len = self.X_val.shape[0]
