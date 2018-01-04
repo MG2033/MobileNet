@@ -148,12 +148,7 @@ class Train:
             loss, acc, argmax, nodes = self.sess.run(
                 [self.model.loss, self.model.accuracy, self.model.y_out_argmax, self.model.nodes],
                 feed_dict=feed_dict)
-            import pickle
-            with open('mine.pkl', 'wb') as file:
-                pickle.dump(nodes, file)
-            for key, value in nodes.items():
-                print(key)
-            print("Predicted class is: " + str(argmax))
+
             # Append loss and accuracy
             loss_list += [loss]
             acc_list += [acc]
