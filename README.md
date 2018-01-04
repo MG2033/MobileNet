@@ -3,7 +3,7 @@ An implementation of `Google ShuffleNet` introduced in TensorFlow. According to 
 
 Link to the original paper: [MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications](https://arxiv.org/abs/1704.04861)
 
-This implementation was made to be clearer than TensorFlow original implementation. It was also made to be an example of a common DL software architecture. The weights/biases/parameters from the pretrained ImageNet model that was implemented by TensorFlow are dumped to a dictionary in pickle format file to allow a less restrictive way of loading them.
+This implementation was made to be clearer than TensorFlow original implementation. It was also made to be an example of a common DL software architecture. The weights/biases/parameters from the pretrained ImageNet model that was implemented by TensorFlow are dumped to a dictionary in pickle format file (`pretrained_weights/mobilenet_v1.pkl`) to allow a less restrictive way of loading them.
 
 
 ## Depthwise Separable Convolution
