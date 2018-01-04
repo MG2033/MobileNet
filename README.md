@@ -8,7 +8,7 @@ This implementation was made to be clearer than TensorFlow original implementati
 
 ## Depthwise Separable Convolution
 <div align="center">
-<img src="https://github.com/MG2033/MobileNet/blob/master/figures/dws.PNG"><br><br>
+<img src="https://github.com/MG2033/MobileNet/blob/master/figures/dws.png"><br><br>
 </div>
 
 ## Usage
