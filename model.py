@@ -225,6 +225,7 @@ class MobileNet:
                                          bias=self.args.bias))
             self.__add_to_nodes([avg_pool, dropped, self.logits])
 
+
     def __init_output(self):
         with tf.variable_scope('output'):
             self.regularization_loss = tf.reduce_sum(tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES))
