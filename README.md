@@ -17,6 +17,7 @@ The paper uses ReLU6 as an activation function. ReLU6 was first introduced in [C
 ## Usage
 ### Main Dependencies
  ```
+ Python 3 and above
  tensorflow 1.3.0
  numpy 1.13.1
  tqdm 4.15.0
