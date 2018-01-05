@@ -1,15 +1,18 @@
 # MobileNet
-An implementation of `Google ShuffleNet` introduced in TensorFlow. According to the authors, `MobileNet` is a computationally efficient CNN architecture designed specifically for mobile devices with very limited computing power. It can be used for different applications including: Object-Detection, Finegrain Classification, Face Attributes and Large Scale Geo-Localization.
+An implementation of `Google MobileNet` introduced in TensorFlow. According to the authors, `MobileNet` is a computationally efficient CNN architecture designed specifically for mobile devices with very limited computing power. It can be used for different applications including: Object-Detection, Finegrain Classification, Face Attributes and Large Scale Geo-Localization.
 
 Link to the original paper: [MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications](https://arxiv.org/abs/1704.04861)
 
-This implementation was made to be clearer than TensorFlow original implementation. It was also made to be an example of a common DL software architecture. The weights/biases/parameters from the pretrained ImageNet model that was implemented by TensorFlow are dumped to a dictionary in pickle format file to allow a less restrictive way of loading them.
+This implementation was made to be clearer than TensorFlow original implementation. It was also made to be an example of a common DL software architecture. The weights/biases/parameters from the pretrained ImageNet model that was implemented by TensorFlow are dumped to a dictionary in pickle format file (`pretrained_weights/mobilenet_v1.pkl`) to allow a less restrictive way of loading them.
 
 
 ## Depthwise Separable Convolution
 <div align="center">
-<img src="https://github.com/MG2033/MobileNet/blob/master/figures/dws.PNG"><br><br>
+<img src="https://github.com/MG2033/MobileNet/blob/master/figures/dws.png"><br><br>
 </div>
+
+## ReLU6
+The paper uses ReLU6 as an activation function. ReLU6 was first introduced in [Convolutional Deep Belief Networks on CIFAR-10](https://www.cs.toronto.edu/~kriz/conv-cifar10-aug2010.pdf) as a ReLU with clipping its output at 6.0.
 
 ## Usage
 ### Main Dependencies
