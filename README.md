@@ -21,7 +21,7 @@ The paper uses ReLU6 as an activation function. ReLU6 was first introduced in [C
  tensorflow 1.3.0
  numpy 1.13.1
  tqdm 4.15.0
- bunch 1.0.1
+ easydict 1.7
  matplotlib 2.0.2
  ```
 ### Train and Test
