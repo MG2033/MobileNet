@@ -23,6 +23,7 @@ The paper uses ReLU6 as an activation function. ReLU6 was first introduced in [C
  tqdm 4.15.0
  easydict 1.7
  matplotlib 2.0.2
+ pillow 5.0.0
  ```
 ### Train and Test
 1. Prepare your data, and modify the data_loader.py/DataLoader/load_data() method.
