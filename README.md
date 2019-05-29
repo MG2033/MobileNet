@@ -33,7 +33,8 @@ Note: If you want to test that the model is pretrained and working properly, I'v
 
 ### Run
 ```
-python main.py config/test.json
+python3 main.py --config config/test.json
+
 ```
 The file 'test.json' is just an example of a file. If you run it as is, it will test the model against the images in directory 'data/test_images'. You can create your own configuration file for training/testing.
 
